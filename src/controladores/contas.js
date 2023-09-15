@@ -1,4 +1,4 @@
-let { banco, contas, ultimoId } = require('../bancodedados')
+let { banco, contas, ultimoId, saques,depositos,transferencias} = require('../bancodedados')
 
 const listarContas = (req, res) => {
 
@@ -108,6 +108,58 @@ const deletarConta = (req,res)=>{
 
 }
 
+const saldo = (req,res)=>{
+	const {numero_conta, senha}= req.query
+
+	if(!numero_conta){
+        return res.status(400).json({mensagem:"O numero da conta é obrigatorio."})
+    }
+    if( !senha){
+        return res.status(400).json({mensagem:"Digite sua senha."})
+    }
+	const contaEncontrada = contas.find(conta =>Number(conta.numero) === Number(numero_conta ))
+
+	if(!contaEncontrada){
+		return res.status(404).json({ mensagem: "Conta inexistente!" })
+	}
+	if(contaEncontrada.usuario.senha !== senha){
+		return res.status(400).json({ mensagem: "Senha invalida!" })
+	}
+
+	return res.json({saldo:contaEncontrada.saldo})
+}
+const extrato = (req,res)=>{
+	const {numero_conta, senha}= req.query
+
+	if(!numero_conta){
+        return res.status(400).json({mensagem:"O numero da conta é obrigatorio."})
+    }
+    if( !senha){
+        return res.status(400).json({mensagem:"Digite sua senha."})
+    }
+	const contaEncontrada = contas.find(conta =>Number(conta.numero) === Number(numero_conta ))
+
+	if(!contaEncontrada){
+		return res.status(404).json({ mensagem: "Conta inexistente!" })
+	}
+	if(contaEncontrada.usuario.senha !== senha){
+		return res.status(400).json({ mensagem: "Senha invalida!" })
+	}
+
+		const extratoDedepositos = depositos.filter(deposito => Number(deposito.numero_conta) === Number(numero_conta))
+		const extratoDesaques = saques.filter(saque => Number(saque.numero_conta) === Number(numero_conta))
+		const transferenciasEnviadas = transferencias.filter(transferencia => Number(transferencia.numero_conta_origem) === Number(numero_conta))
+		const transferenciasRecebidas = transferencias.filter(transferencia => Number(transferencia.numero_conta_destino) === Number(numero_conta))
+	return res.json({
+		depositos:extratoDedepositos,
+		saques: extratoDesaques,
+		transferenciasEnviadas,
+		transferenciasRecebidas
+	})
+}
+
+
+
 
 
 
@@ -115,5 +167,7 @@ module.exports = {
 	listarContas,
 	criarConta,
 	atualizarUsuarioConta,
-	deletarConta
+	deletarConta,
+	saldo,
+	extrato
 }
