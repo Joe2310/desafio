@@ -5,7 +5,7 @@ const rotas = express()
 
 rotas.get('/contas', contas.listarContas)
 rotas.get('/contas/saldo',contas.saldo)
-rotas.get('/contas/extrato',contas.extrato)
+rotas.get('/contas/extrato',contas.extrato )
 rotas.post('/contas', contas.criarConta)
 rotas.put(`/contas/:numeroConta/usuario`,contas.atualizarUsuarioConta)
 rotas.delete(`/contas/:numeroConta`,contas.deletarConta)
